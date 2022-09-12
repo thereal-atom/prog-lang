@@ -1,0 +1,3 @@
+# programming language
+
+I have at least 4 projects which I'm working on so why not add a 5th which I know I won't finish because I'm lazy and I'm not smart enough :D. But in all seriousness I wanted to get into some advanced programming projects, mainly in systems engineering, to beef up my portfolio, and wanted an excuse to use rust so I'm working on an [implementation of a neural network from scratch](https://github.com/thereal-atom/neural-network-implementation) and now this.
