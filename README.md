@@ -2,6 +2,10 @@
 
 I have at least 4 projects which I'm working on so why not add a 5th which I know I won't finish because I'm lazy and I'm not smart enough :D. But in all seriousness I wanted to get into some advanced programming projects, mainly in systems engineering, to beef up my portfolio, and wanted an excuse to use rust so I'm working on an [implementation of a neural network from scratch](https://github.com/thereal-atom/neural-network-implementation) and now this.
 
-I hope this will teach me about a lot of fundemental programming concepts such as data structures, algorithms, system architecture, memory management, low level computing and more. Along with this I want to, of course, gain knowledge of rust and general lower level programming.
+I hope this will teach me about a lot of fundamental programming concepts such as data structures, algorithms, system architecture, memory management, low level computing and more. Along with this I want to, of course, gain knowledge of rust and general lower level programming.
 
 I will most likely not be using this language for any practical projects but I hope it would impress my classmates who struggle to write loops and functions in python. Most of all I think this will be a fun project!
+
+So normally, if I want a compiled language (I do), the standard approach would be for me to use LLVM or a transpiler. There are too many operating systems and architectures for it to be viable to make my own compiler from scratch. But I don't necessarily want this language to be massively practical, the goal of t his is to learn as much about language development as possible.
+
+So instead, I want to make a compiler just for the AMD chip and Arch distro (manjaro) I am using. That is to say: a program which converts the code of my language into assembly code that can run only (or at least) on the hardware as well as software that I'm using. However, at this point in time (19/09 at 7pm), I am not sure if that's how it works. So another option would be for me to make my own assembly language and my own assembly code runner. This would also be very interesting I think, so even if the former option works, this one would be fun too (this may also not be doable but I'm just thinking up ideas as I go along ahaha). So essentially, I suppose I would just be creating a virtual computer.
