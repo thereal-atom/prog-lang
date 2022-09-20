@@ -116,6 +116,12 @@ struct SixteenBitAdderResult {
     carry_out: Bit,
 }
 fn sixteen_bit_adder(a: [Bit; BITS], b: [Bit; BITS], carry_in: Bit) -> SixteenBitAdderResult {
+    // so what I'm trying to do here is ripple carry adder stuff
+    // but it doesn't work
+    // I suspect that's because I'm adding the carry in bit incorrectly.
+    // instead the first adder should be a half adder
+    // and the carry in should go to the carry in of the last adder instead of the first one.
+
     let mut latest_result = adder(a[0], b[0], carry_in);
     let mut sum = [latest_result.sum; BITS];
     
@@ -212,6 +218,26 @@ impl VirtualComputer {
         };
 
         print!(" {}\n", bit_to_int(seventy_three.carry_out));
+
+        // let sum0 = adder(Zero, Zero, Zero);
+        // let sum1 = adder(Zero, Zero, One);
+        // let sum2 = adder(Zero, One, Zero);
+        // let sum3 = adder(Zero, One, One);
+        // let sum4 = adder(One, Zero, Zero);
+        // let sum5 = adder(One, Zero, One);
+        // let sum6 = adder(One, One, Zero);
+        // let sum7 = adder(One, One, One);
+
+        // println!("Sum | Carry | Expected Sum | Expected Carry | Expected Decimal");
+        // println!("--------------------------------------------------------------");
+        // println!("{}   | {}     | 0            | 0              | 0               ", bit_to_int(sum0.sum), bit_to_int(sum0.carry_out));
+        // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum1.sum), bit_to_int(sum1.carry_out));
+        // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum2.sum), bit_to_int(sum2.carry_out));
+        // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum3.sum), bit_to_int(sum3.carry_out));
+        // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum4.sum), bit_to_int(sum4.carry_out));
+        // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum5.sum), bit_to_int(sum5.carry_out));
+        // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum6.sum), bit_to_int(sum6.carry_out));
+        // println!("{}   | {}     | 1            | 1              | 3               ", bit_to_int(sum7.sum), bit_to_int(sum7.carry_out));
 
         VirtualComputer {
             cpu: CPU {
