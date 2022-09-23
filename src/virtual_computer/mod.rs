@@ -30,6 +30,8 @@ fn ints_to_bits(ints: Vec<u8>) -> Vec<Bit> {
 
     bits
 }
+use std::ops::Add;
+
 use Bit::*;
 
 //
@@ -74,16 +76,19 @@ struct AdderResult {
     sum: Bit,
     carry_out: Bit,
 }
+fn half_adder(a: Bit, b: Bit) -> AdderResult {
+    AdderResult {
+        sum: xor(a, b),
+        carry_out: and(a, b),
+    }
+}
 fn adder(a: Bit, b: Bit, carry_in: Bit) -> AdderResult {
-    let d = xor(a, b);
-    let e = and(b, a);
-    let sum = xor(d, carry_in);
-    let g = and(d, carry_in);
-    let carry_out = or(g, e);
+    let result1 = half_adder(a, b);
+    let result2 = half_adder(result1.sum, carry_in);
     
     AdderResult {
-        sum,
-        carry_out,
+        sum: result2.sum,
+        carry_out: or(result1.carry_out, result2.carry_out),
     }
 }
 
@@ -116,26 +121,50 @@ struct SixteenBitAdderResult {
     carry_out: Bit,
 }
 fn sixteen_bit_adder(a: [Bit; BITS], b: [Bit; BITS], carry_in: Bit) -> SixteenBitAdderResult {
-    // so what I'm trying to do here is ripple carry adder stuff
-    // but it doesn't work
-    // I suspect that's because I'm adding the carry in bit incorrectly.
-    // instead the first adder should be a half adder
-    // and the carry in should go to the carry in of the last adder instead of the first one.
+    // so I tried the ripple carry adder but it did not work
+    // at this point it's not apparent to me what the issue is
+    // I tested the adders for all cases and they work fine
+    // so I'll try some 4 bit adders and see if they work
 
-    let mut latest_result = adder(a[0], b[0], carry_in);
-    let mut sum = [latest_result.sum; BITS];
-    
-    let mut bit = 1;
-    while bit < BITS {
-        latest_result = adder(a[bit], b[bit], latest_result.carry_out);
-        sum[bit] = latest_result.sum;
+    let mut sum = [Zero; BITS];
 
-        bit += 1;
-    };
+    let sum0 = adder(a[0], b[0], carry_in);
+    let sum1 = adder(sum0.carry_out, a[1], b[1]);
+    let sum2 = adder(sum1.carry_out, a[2], b[2]);
+    let sum3 = adder(sum2.carry_out, a[3], b[3]);
+    let sum4 = adder(sum3.carry_out, a[4], b[4]);
+    let sum5 = adder(sum4.carry_out, a[5], b[5]);
+    let sum6 = adder(sum5.carry_out, a[6], b[6]);
+    let sum7 = adder(sum6.carry_out, a[7], b[7]);
+    let sum8 = adder(sum7.carry_out, a[8], b[8]);
+    let sum9 = adder(sum8.carry_out, a[9], b[9]);
+    let sum10 = adder(sum9.carry_out, a[10], b[10]);
+    let sum11 = adder(sum10.carry_out, a[11], b[11]);
+    let sum12 = adder(sum11.carry_out, a[12], b[12]);
+    let sum13 = adder(sum12.carry_out, a[13], b[13]);
+    let sum14 = adder(sum13.carry_out, a[14], b[14]);
+    let sum15 = adder(sum14.carry_out, a[15], b[15]);
+
+    sum[0] = sum0.sum;
+    sum[1] = sum1.sum;
+    sum[2] = sum2.sum;
+    sum[3] = sum3.sum;
+    sum[4] = sum4.sum;
+    sum[5] = sum5.sum;
+    sum[6] = sum6.sum;
+    sum[7] = sum7.sum;
+    sum[8] = sum8.sum;
+    sum[9] = sum9.sum;
+    sum[10] = sum10.sum;
+    sum[11] = sum11.sum;
+    sum[12] = sum12.sum;
+    sum[13] = sum13.sum;
+    sum[14] = sum14.sum;
+    sum[15] = sum15.sum;
 
     SixteenBitAdderResult {
         sum,
-        carry_out: latest_result.carry_out,
+        carry_out: sum15.carry_out,
     }
 }
 
@@ -194,22 +223,28 @@ impl VirtualComputer {
     pub fn new() -> VirtualComputer {
         println!("Creating a {}-bit virtual computer...", BITS);
 
-        let mut number_a_bits = [Zero; BITS];
-        let mut number_b_bits = [Zero; BITS];
+        // let mut number_a_bits = [Zero; BITS];
+        // let mut number_b_bits = [Zero; BITS];
 
-        let mut i = 0;
-        while i < BITS {
-            number_a_bits[i] = ints_to_bits(vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0])[i];
-            number_b_bits[i] = ints_to_bits(vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1])[i];
+        // let mut i = 0;
+        // while i < BITS {
+        //     number_a_bits[i] = ints_to_bits(vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0])[i];
+        //     number_b_bits[i] = ints_to_bits(vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1])[i];
 
-            i += 1;
-        }
+        //     i += 1;
+        // }
         
         let seventy_three = sixteen_bit_adder(
-            number_a_bits,
-            number_b_bits,
+            [Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, One, Zero, Zero, Zero, Zero, Zero],
+            [Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, One, Zero, One, Zero, Zero, One],
             Zero,
         );
+
+        // let seventy_three = sixteen_bit_adder(
+        //     number_a_bits,
+        //     number_b_bits,
+        //     Zero,
+        // );
 
         let mut bit = 0;
         while bit < BITS {
@@ -218,26 +253,6 @@ impl VirtualComputer {
         };
 
         print!(" {}\n", bit_to_int(seventy_three.carry_out));
-
-        // let sum0 = adder(Zero, Zero, Zero);
-        // let sum1 = adder(Zero, Zero, One);
-        // let sum2 = adder(Zero, One, Zero);
-        // let sum3 = adder(Zero, One, One);
-        // let sum4 = adder(One, Zero, Zero);
-        // let sum5 = adder(One, Zero, One);
-        // let sum6 = adder(One, One, Zero);
-        // let sum7 = adder(One, One, One);
-
-        // println!("Sum | Carry | Expected Sum | Expected Carry | Expected Decimal");
-        // println!("--------------------------------------------------------------");
-        // println!("{}   | {}     | 0            | 0              | 0               ", bit_to_int(sum0.sum), bit_to_int(sum0.carry_out));
-        // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum1.sum), bit_to_int(sum1.carry_out));
-        // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum2.sum), bit_to_int(sum2.carry_out));
-        // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum3.sum), bit_to_int(sum3.carry_out));
-        // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum4.sum), bit_to_int(sum4.carry_out));
-        // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum5.sum), bit_to_int(sum5.carry_out));
-        // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum6.sum), bit_to_int(sum6.carry_out));
-        // println!("{}   | {}     | 1            | 1              | 3               ", bit_to_int(sum7.sum), bit_to_int(sum7.carry_out));
 
         VirtualComputer {
             cpu: CPU {
@@ -263,4 +278,28 @@ impl VirtualComputer {
 
     // Bus
     // The bus is where all inputs and outputs travel between the CPU and memory
+}
+
+// Tests ==========================================================================================================================================================
+
+fn test_adders () {
+    // let sum0 = adder(Zero, Zero, Zero);
+    // let sum1 = adder(Zero, Zero, One);
+    // let sum2 = adder(Zero, One, Zero);
+    // let sum3 = adder(Zero, One, One);
+    // let sum4 = adder(One, Zero, Zero);
+    // let sum5 = adder(One, Zero, One);
+    // let sum6 = adder(One, One, Zero);
+    // let sum7 = adder(One, One, One);
+
+    // println!("Sum | Carry | Expected Sum | Expected Carry | Expected Decimal");
+    // println!("--------------------------------------------------------------");
+    // println!("{}   | {}     | 0            | 0              | 0               ", bit_to_int(sum0.sum), bit_to_int(sum0.carry_out));
+    // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum1.sum), bit_to_int(sum1.carry_out));
+    // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum2.sum), bit_to_int(sum2.carry_out));
+    // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum3.sum), bit_to_int(sum3.carry_out));
+    // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum4.sum), bit_to_int(sum4.carry_out));
+    // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum5.sum), bit_to_int(sum5.carry_out));
+    // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum6.sum), bit_to_int(sum6.carry_out));
+    // println!("{}   | {}     | 1            | 1              | 3               ", bit_to_int(sum7.sum), bit_to_int(sum7.carry_out));
 }
