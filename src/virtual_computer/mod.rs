@@ -234,11 +234,11 @@ impl VirtualComputer {
         //     i += 1;
         // }
         
-        let seventy_three = sixteen_bit_adder(
-            [Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, One, Zero, Zero, Zero, Zero, Zero],
-            [Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, One, Zero, One, Zero, Zero, One],
-            Zero,
-        );
+        // let seventy_three = sixteen_bit_adder(
+        //     [Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, One, Zero, Zero, Zero, Zero, Zero],
+        //     [Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, One, Zero, One, Zero, Zero, One],
+        //     Zero,
+        // );
 
         // let seventy_three = sixteen_bit_adder(
         //     number_a_bits,
@@ -246,13 +246,24 @@ impl VirtualComputer {
         //     Zero,
         // );
 
+        let sixteen = four_bit_adder(
+            [One, One, Zero, Zero],
+            [One, Zero, One, One],
+            Zero
+        );
+
+        print!("Result:  ");
+        print!(" {}", bit_to_int(sixteen.carry_out));
+
         let mut bit = 0;
-        while bit < BITS {
-            print!("{}", bit_to_int(seventy_three.sum[bit]));
+        while bit < 4 {
+            print!("{}", bit_to_int(sixteen.sum[bit]));
             bit += 1;
         };
 
-        print!(" {}\n", bit_to_int(seventy_three.carry_out));
+        println!("\nExpected: 10111");
+
+        // test_adders();
 
         VirtualComputer {
             cpu: CPU {
@@ -283,23 +294,23 @@ impl VirtualComputer {
 // Tests ==========================================================================================================================================================
 
 fn test_adders () {
-    // let sum0 = adder(Zero, Zero, Zero);
-    // let sum1 = adder(Zero, Zero, One);
-    // let sum2 = adder(Zero, One, Zero);
-    // let sum3 = adder(Zero, One, One);
-    // let sum4 = adder(One, Zero, Zero);
-    // let sum5 = adder(One, Zero, One);
-    // let sum6 = adder(One, One, Zero);
-    // let sum7 = adder(One, One, One);
+    let sum0 = adder(Zero, Zero, Zero);
+    let sum1 = adder(Zero, Zero, One);
+    let sum2 = adder(Zero, One, Zero);
+    let sum3 = adder(Zero, One, One);
+    let sum4 = adder(One, Zero, Zero);
+    let sum5 = adder(One, Zero, One);
+    let sum6 = adder(One, One, Zero);
+    let sum7 = adder(One, One, One);
 
-    // println!("Sum | Carry | Expected Sum | Expected Carry | Expected Decimal");
-    // println!("--------------------------------------------------------------");
-    // println!("{}   | {}     | 0            | 0              | 0               ", bit_to_int(sum0.sum), bit_to_int(sum0.carry_out));
-    // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum1.sum), bit_to_int(sum1.carry_out));
-    // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum2.sum), bit_to_int(sum2.carry_out));
-    // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum3.sum), bit_to_int(sum3.carry_out));
-    // println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum4.sum), bit_to_int(sum4.carry_out));
-    // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum5.sum), bit_to_int(sum5.carry_out));
-    // println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum6.sum), bit_to_int(sum6.carry_out));
-    // println!("{}   | {}     | 1            | 1              | 3               ", bit_to_int(sum7.sum), bit_to_int(sum7.carry_out));
+    println!("Sum | Carry | Expected Sum | Expected Carry | Expected Decimal");
+    println!("--------------------------------------------------------------");
+    println!("{}   | {}     | 0            | 0              | 0               ", bit_to_int(sum0.sum), bit_to_int(sum0.carry_out));
+    println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum1.sum), bit_to_int(sum1.carry_out));
+    println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum2.sum), bit_to_int(sum2.carry_out));
+    println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum3.sum), bit_to_int(sum3.carry_out));
+    println!("{}   | {}     | 1            | 0              | 1               ", bit_to_int(sum4.sum), bit_to_int(sum4.carry_out));
+    println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum5.sum), bit_to_int(sum5.carry_out));
+    println!("{}   | {}     | 0            | 1              | 2               ", bit_to_int(sum6.sum), bit_to_int(sum6.carry_out));
+    println!("{}   | {}     | 1            | 1              | 3               ", bit_to_int(sum7.sum), bit_to_int(sum7.carry_out));
 }
