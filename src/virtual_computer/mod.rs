@@ -1,6 +1,6 @@
 #[derive(PartialEq)]
 #[derive(Clone, Copy)]
-enum Bit {
+pub enum Bit {
     Zero = 0,
     One = 1,
 }
@@ -30,7 +30,6 @@ fn ints_to_bits(ints: Vec<u8>) -> Vec<Bit> {
 
     bits
 }
-use std::ops::Add;
 
 use Bit::*;
 
@@ -121,50 +120,20 @@ struct SixteenBitAdderResult {
     carry_out: Bit,
 }
 fn sixteen_bit_adder(a: [Bit; BITS], b: [Bit; BITS], carry_in: Bit) -> SixteenBitAdderResult {
-    // so I tried the ripple carry adder but it did not work
-    // at this point it's not apparent to me what the issue is
-    // I tested the adders for all cases and they work fine
-    // so I'll try some 4 bit adders and see if they work
-
     let mut sum = [Zero; BITS];
+    let mut latest_result = adder(a[15], b[15], carry_in);
 
-    let sum0 = adder(a[0], b[0], carry_in);
-    let sum1 = adder(sum0.carry_out, a[1], b[1]);
-    let sum2 = adder(sum1.carry_out, a[2], b[2]);
-    let sum3 = adder(sum2.carry_out, a[3], b[3]);
-    let sum4 = adder(sum3.carry_out, a[4], b[4]);
-    let sum5 = adder(sum4.carry_out, a[5], b[5]);
-    let sum6 = adder(sum5.carry_out, a[6], b[6]);
-    let sum7 = adder(sum6.carry_out, a[7], b[7]);
-    let sum8 = adder(sum7.carry_out, a[8], b[8]);
-    let sum9 = adder(sum8.carry_out, a[9], b[9]);
-    let sum10 = adder(sum9.carry_out, a[10], b[10]);
-    let sum11 = adder(sum10.carry_out, a[11], b[11]);
-    let sum12 = adder(sum11.carry_out, a[12], b[12]);
-    let sum13 = adder(sum12.carry_out, a[13], b[13]);
-    let sum14 = adder(sum13.carry_out, a[14], b[14]);
-    let sum15 = adder(sum14.carry_out, a[15], b[15]);
+    let mut bit = BITS - 2;
+    while bit > 0 {
+        latest_result = adder(a[bit], b[bit], latest_result.carry_out);
+        sum[bit] = latest_result.sum;
 
-    sum[0] = sum0.sum;
-    sum[1] = sum1.sum;
-    sum[2] = sum2.sum;
-    sum[3] = sum3.sum;
-    sum[4] = sum4.sum;
-    sum[5] = sum5.sum;
-    sum[6] = sum6.sum;
-    sum[7] = sum7.sum;
-    sum[8] = sum8.sum;
-    sum[9] = sum9.sum;
-    sum[10] = sum10.sum;
-    sum[11] = sum11.sum;
-    sum[12] = sum12.sum;
-    sum[13] = sum13.sum;
-    sum[14] = sum14.sum;
-    sum[15] = sum15.sum;
+        bit -= 1;
+    }
 
     SixteenBitAdderResult {
         sum,
-        carry_out: sum15.carry_out,
+        carry_out: latest_result.carry_out,
     }
 }
 
@@ -190,25 +159,50 @@ impl ALU {
         ALU {}
     }
 
-    fn process(a: [Bit; BITS], b: [Bit; BITS], subtract: Bit) -> ALUProcessResult {
+    pub fn process(a: [Bit; BITS], b: [Bit; BITS], subtract: Bit) -> ALUProcessResult {
+        let mut b_bits = b;
+
+        let mut b_bit = 0;
+        while b_bit < BITS - 1 {
+            b_bits[b_bit] = xor(b_bits[b_bit], subtract);
+
+            b_bit += 1;
+        }
+
+        let adder_result = sixteen_bit_adder(a, b_bits, subtract);
+
+        let mut is_zero = Zero;
+
+        // this would normally use a bunch of 'not' and 'and' gates
+        // but I'm too lazy for that so I'll just use a loop like this
+
+        let mut sum_bit = 0;
+        while sum_bit < BITS - 1 {
+            if adder_result.sum[sum_bit] == One {
+                is_zero = One;
+            }
+
+            sum_bit += 1;
+        }
+
         ALUProcessResult {
             flags: ALUFlags {
-                zero: Zero,
-                carry: Zero,
-                negative: Zero,
+                zero: is_zero,
+                carry: adder_result.carry_out,
+                negative: adder_result.sum[0],
             },
-            sum: [Zero; BITS],
+            sum: adder_result.sum,
         } 
     }
 }
 struct CPU {
-    alu: ALU,
+    pub alu: ALU,
 }
 struct Memory {
     y: i32,
 }
 pub struct VirtualComputer {
-    cpu: CPU,
+    pub cpu: CPU,
     memory: Memory,
 }
 impl VirtualComputer {
@@ -246,22 +240,22 @@ impl VirtualComputer {
         //     Zero,
         // );
 
-        let sixteen = four_bit_adder(
-            [One, One, Zero, Zero],
-            [One, Zero, One, One],
-            Zero
-        );
+        // let sixteen = four_bit_adder(
+        //     [One, One, Zero, Zero],
+        //     [One, Zero, One, One],
+        //     Zero
+        // );
 
-        print!("Result:  ");
-        print!(" {}", bit_to_int(sixteen.carry_out));
+        // print!("Result:  ");
+        // print!(" {} ", bit_to_int(seventy_three.carry_out));
 
-        let mut bit = 0;
-        while bit < 4 {
-            print!("{}", bit_to_int(sixteen.sum[bit]));
-            bit += 1;
-        };
+        // let mut bit = 0;
+        // while bit < BITS {
+        //     print!("{}", bit_to_int(seventy_three.sum[bit]));
+        //     bit += 1;
+        // };
 
-        println!("\nExpected: 10111");
+        // println!("\nExpected: 0 0000000001001001");
 
         // test_adders();
 
